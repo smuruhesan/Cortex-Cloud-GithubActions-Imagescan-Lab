@@ -1,0 +1,40 @@
+name: Build, Push, and Deploy to AKS
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-push-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Login to Azure using the existing AZURE_CREDENTIALS secret
+      - name: Log in to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # Build the Docker image
+      - name: Build Docker image
+        run: docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/simple-app:${{ github.sha }} .
+
+      # Push the image to ACR
+      - name: Push image to ACR
+        run: docker push ${{ secrets.ACR_NAME }}.azurecr.io/simple-app:${{ github.sha }}
+
+      # Get AKS credentials and set up kubectl
+      - name: Set up kubectl context
+        uses: azure/aks-set-context@v1
+        with:
+          resource-group: ${{ secrets.AKS_RESOURCE_GROUP }}
+          cluster-name: ${{ secrets.AKS_CLUSTER_NAME }}
+          
+      # Create or update the DaemonSet in AKS
+      - name: Deploy to AKS
+        run: |
+          kubectl apply -f daemonset.yaml
+          kubectl set image daemonset/simple-app simple-app-container=${{ secrets.ACR_NAME }}.azurecr.io/simple-app:${{ github.sha }}
