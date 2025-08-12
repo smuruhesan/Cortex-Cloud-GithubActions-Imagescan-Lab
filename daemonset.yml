@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: simple-app
+spec:
+  selector:
+    matchLabels:
+      app: simple-app
+  template:
+    metadata:
+      labels:
+        app: simple-app
+    spec:
+      containers:
+      - name: simple-app-container
+        image: ${{ secrets.ACR_NAME }}.azurecr.io/simple-app:latest # Initial placeholder image
+        ports:
+        - containerPort: 80
+      imagePullSecrets:
+      - name: acr-secret
