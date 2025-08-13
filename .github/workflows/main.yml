@@ -37,6 +37,7 @@ jobs:
         with:
           resource-group: ${{ secrets.AKS_RESOURCE_GROUP }}
           cluster-name: ${{ secrets.AKS_CLUSTER_NAME }}
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
           
       # Create or update the DaemonSet in AKS
       - name: Deploy to AKS
