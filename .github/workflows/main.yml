@@ -18,6 +18,11 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      # Login to Azure Container Registry (ACR)
+      - name: Log in to ACR
+        run: |
+          az acr login --name ${{ secrets.ACR_NAME }}
+
       # Build the Docker image
       - name: Build Docker image
         run: docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/simple-app:${{ github.sha }} .
