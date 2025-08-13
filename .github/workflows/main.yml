@@ -42,5 +42,7 @@ jobs:
       # Create or update the DaemonSet in AKS
       - name: Deploy to AKS
         run: |
+          pwd
+          ls -l
           kubectl apply -f daemonset.yaml
           kubectl set image daemonset/simple-app simple-app-container=${{ secrets.ACR_NAME }}.azurecr.io/simple-app:${{ github.sha }}
